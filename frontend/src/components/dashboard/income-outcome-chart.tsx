@@ -12,6 +12,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts'
+import React, { memo } from 'react'
 
 interface IncomeOutcomeChartProps {
   data: MonthlyDataPoint[]
@@ -46,7 +47,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   )
 }
 
-export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
+export const IncomeOutcomeChart = memo(function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
   if (loading) {
     return (
       <Card className="border-border/60">
@@ -76,7 +77,11 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+            <LineChart
+              aria-label="Line chart showing monthly income and outcome for the year 2024"
+              tabindex="0"
+              alt="Income and Outcome Chart"
+              data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.6} />
               <XAxis
                 dataKey="month"
@@ -119,6 +124,27 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
           </ResponsiveContainer>
         )}
       </CardContent>
+      <div className="sr-only">
+        <table>
+          <caption>Monthly income and outcome data for 2024</caption>
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Income</th>
+              <th>Outcome</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((row) => (
+              <tr key={row.month}>
+                <td>{row.month}</td>
+                <td>{row.income}</td>
+                <td>{row.outcome}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </Card>
   )
-}
+})

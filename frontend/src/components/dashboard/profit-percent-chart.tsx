@@ -11,6 +11,7 @@ import {
   ReferenceLine,
   ResponsiveContainer,
 } from 'recharts'
+import React, { memo } from 'react'
 
 interface ProfitPercentChartProps {
   data: MonthlyDataPoint[]
@@ -47,7 +48,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   )
 }
 
-export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
+export const ProfitPercentChart = memo(function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
   if (loading) {
     return (
       <Card className="border-border/60">
@@ -77,7 +78,11 @@ export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+            <LineChart
+              aria-label="Line chart showing profit percentage trends for the year 2024"
+              tabindex="0"
+              alt="Profit Percentage Chart"
+              data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" strokeOpacity={0.6} />
               <XAxis
                 dataKey="month"
@@ -105,9 +110,27 @@ export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
                 activeDot={{ r: 5, strokeWidth: 0 }}
               />
             </LineChart>
+            {/* Add visually hidden table for screen readers */}
+            <table className="sr-only">
+              <caption>Profit percentage trends for 2024</caption>
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th>Profit Percentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((row) => (
+                  <tr key={row.month}>
+                    <td>{row.month}</td>
+                    <td>{row.profitPercentage}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </ResponsiveContainer>
         )}
       </CardContent>
     </Card>
   )
-}
+})

@@ -19,18 +19,18 @@ function formatMonthYearLabel(yearMonthKey: string): string {
 }
 
 export function computeKPIs(movements: FinancialMovement[]): KPIMetrics {
-  const totalIncome = movements
-    .filter((m) => m.operation_type === "income")
-    .reduce((sum, m) => sum + m.amount, 0);
+  const { income, outcome } = movements.reduce(
+    (acc, m) => {
+      if (m.operation_type === "income") acc.income += m.amount;
+      else acc.outcome += m.amount;
+      return acc;
+    },
+    { income: 0, outcome: 0 }
+  );
+  const profit = income - outcome;
+  const profitPercent = income > 0 ? (profit / income) * 100 : 0;
 
-  const totalOutcome = movements
-    .filter((m) => m.operation_type === "outcome")
-    .reduce((sum, m) => sum + m.amount, 0);
-
-  const profit = totalIncome - totalOutcome;
-  const profitPercent = totalIncome > 0 ? (profit / totalIncome) * 100 : 0;
-
-  return { totalIncome, totalOutcome, profit, profitPercent };
+  return { totalIncome: income, totalOutcome: outcome, profit, profitPercent };
 }
 
 export function computeMonthlyData(
